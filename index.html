@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 MLB Draft — Mock Draft Board</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;700&family=Instrument+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --midnight: #060d1a;
+    --red: #c8102e;
+    --gold: #e8c04a;
+    --cream: #f5f0e8;
+    --muted: #8a9bb5;
+    --card: #111d30;
+    --border: #1e2f4a;
+    --teal: #4ecdc4;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--midnight); color:var(--cream); font-family:'Instrument Sans',sans-serif; min-height:100vh; overflow-x:hidden; }
+
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events:none; z-index:100; opacity:0.5;
+  }
+
+  /* HEADER */
+  header { position:relative; padding:60px 40px 50px; border-bottom:1px solid var(--border); overflow:hidden; }
+  header::after {
+    content:'2026'; position:absolute; right:-20px; top:-30px;
+    font-family:'Bebas Neue',sans-serif; font-size:clamp(140px,20vw,280px);
+    color:rgba(200,16,46,0.06); line-height:1; pointer-events:none; letter-spacing:-5px;
+  }
+  .header-eyebrow { font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--red); margin-bottom:16px; }
+  header h1 {
+    font-family:'Bebas Neue',sans-serif; font-size:clamp(52px,8vw,100px); line-height:0.9; letter-spacing:2px;
+    background:linear-gradient(135deg,var(--cream) 60%,var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  }
+  .header-sub { font-family:'DM Serif Display',serif; font-style:italic; font-size:18px; color:var(--muted); margin-top:12px; }
+  .header-meta { display:flex; gap:30px; margin-top:30px; flex-wrap:wrap; }
+  .meta-item { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); letter-spacing:1px; }
+  .meta-item span { display:block; color:var(--gold); font-size:13px; font-weight:700; margin-top:2px; }
+
+  /* BOARD */
+  .draft-board { padding:30px 40px; max-width:1400px; margin:0 auto; }
+
+  .board-header {
+    display:grid; grid-template-columns:60px 1fr 180px 110px 1fr;
+    gap:16px; padding:0 20px 12px; border-bottom:1px solid var(--border); margin-bottom:8px;
+  }
+  .col-head { font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
+
+  /* SECTION HEADERS */
+  .round-header { display:flex; align-items:flex-start; gap:14px; padding:28px 20px 10px; margin-top:10px; }
+  .round-label { font-family:'Bebas Neue',sans-serif; font-size:24px; letter-spacing:2px; white-space:nowrap; flex-shrink:0; }
+  .round-label.r1   { color:var(--red); }
+  .round-label.rppi { color:var(--teal); }
+  .round-label.rcba { color:var(--gold); }
+  .round-line-v { width:1px; background:var(--border); align-self:stretch; margin:4px 2px; flex-shrink:0; }
+  .round-note { font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--muted); letter-spacing:0.5px; line-height:1.6; padding-top:6px; }
+
+  /* PICK ROW */
+  .pick {
+    display:grid; grid-template-columns:60px 1fr 180px 110px 1fr;
+    gap:16px; align-items:center; padding:14px 20px;
+    border:1px solid transparent; border-radius:3px; margin-bottom:4px;
+    background:var(--card); transition:all 0.22s ease; cursor:default;
+    animation:fadeSlide 0.4s both; position:relative; overflow:hidden;
+  }
+  .pick::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--border); transition:background 0.2s; }
+  .pick:hover { border-color:var(--border); background:#16253d; transform:translateX(4px); }
+  .pick:hover::before { background:var(--red); }
+
+  .pick.top-pick { background:linear-gradient(90deg,#16253d,var(--card)); }
+  .pick.top-pick .pick-num { font-size:34px; }
+
+  .pick.ppi-pick { background:linear-gradient(90deg,#071a1a,var(--card)); }
+  .pick.ppi-pick::before { background:rgba(78,205,196,0.45) !important; }
+  .pick.ppi-pick:hover::before { background:var(--teal) !important; }
+
+  .pick.cb-pick { background:linear-gradient(90deg,#1c1608,var(--card)); }
+  .pick.cb-pick::before { background:rgba(232,192,74,0.45) !important; }
+  .pick.cb-pick:hover::before { background:var(--gold) !important; }
+
+  /* PICK NUMBER */
+  .pick-num { font-family:'Bebas Neue',sans-serif; font-size:28px; color:var(--red); line-height:1; }
+  .ppi-pick .pick-num { color:var(--teal); font-size:20px; letter-spacing:1px; }
+  .cb-pick  .pick-num { color:var(--gold); font-size:20px; letter-spacing:1px; }
+
+  /* PLAYER */
+  .player-name { font-family:'DM Serif Display',serif; font-size:17px; color:var(--cream); line-height:1.15; }
+  .player-meta { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:1px; margin-top:3px; text-transform:uppercase; }
+
+  /* TEAM */
+  .team-cell { font-family:'Instrument Sans',sans-serif; font-size:13px; font-weight:600; color:var(--cream); line-height:1.25; }
+
+  /* POSITION */
+  .position {
+    display:inline-flex; align-items:center; justify-content:center;
+    width:44px; height:44px; border-radius:50%;
+    font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:1px;
+  }
+  .pos-P  { background:rgba(200,16,46,0.15);  color:var(--red);  border:1px solid rgba(200,16,46,0.3); }
+  .pos-C  { background:rgba(232,192,74,0.12); color:var(--gold); border:1px solid rgba(232,192,74,0.3); }
+  .pos-IF { background:rgba(100,160,255,0.1); color:#7ab3ff;     border:1px solid rgba(100,160,255,0.25); }
+  .pos-OF { background:rgba(80,200,120,0.1);  color:#66d490;     border:1px solid rgba(80,200,120,0.25); }
+
+  /* BLURB */
+  .blurb { font-family:'Instrument Sans',sans-serif; font-size:11px; color:var(--muted); line-height:1.55; font-style:italic; }
+
+  @keyframes fadeSlide { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  /* FOOTER */
+  footer { border-top:1px solid var(--border); padding:30px 40px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-top:20px; }
+  footer p { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:1px; }
+  .legend { display:flex; gap:20px; flex-wrap:wrap; }
+  .legend-item { display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; }
+  .legend-dot { width:10px; height:10px; border-radius:50%; }
+
+  @media (max-width:960px) {
+    .board-header { display:none; }
+    .pick { grid-template-columns:48px 1fr auto; }
+    .blurb { display:none; }
+    .draft-board { padding:16px; }
+    header { padding:36px 20px 28px; }
+    footer { flex-direction:column; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-eyebrow">● MLB Mock Draft Board</div>
+  <h1>2026<br>Draft</h1>
+  <div class="header-sub">Round 1, PPI Picks &amp; Competitive Balance Round A — 37 Picks</div>
+  <div class="header-meta">
+    <div class="meta-item">DRAFT DATE<span>July 2026</span></div>
+    <div class="meta-item">EDITION<span>Feb. 22, 2026</span></div>
+    <div class="meta-item">TOTAL PICKS<span>37</span></div>
+  </div>
+</header>
+
+<div class="draft-board">
+  <div class="board-header">
+    <div class="col-head">Pick</div>
+    <div class="col-head">Player</div>
+    <div class="col-head">Team</div>
+    <div class="col-head">Position</div>
+    <div class="col-head">Scouting Note</div>
+  </div>
+  <div id="picks-container"></div>
+</div>
+
+<footer>
+  <p>© 2026 MLB Mock Draft Board — Projections only. Not affiliated with MLB.</p>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Pitcher</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div>Catcher</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#7ab3ff"></div>Infield</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#66d490"></div>Outfield</div>
+  </div>
+</footer>
+
+<script>
+const picks = [
+
+  // ═══════════════════════════════════════════════
+  //  ROUND 1  (Picks 1–25)
+  // ═══════════════════════════════════════════════
+  { pick:1,  round:"R1", name:"Roch Cholowsky",      school:"UCLA",                    type:"COL", pos:"SS",  posClass:"IF", team:"Chicago White Sox",   blurb:"The consensus No. 1 overall prospect. Hit 23 HR with a 1.190 OPS in 2024-25 and opened 2026 with a two-homer game. Plus defender with plus arm — the odds-on favorite to go 1-1." },
+  { pick:2,  round:"R1", name:"Grady Emerson",        school:"Fort Worth Christian HS", type:"HS",  pos:"SS",  posClass:"IF", team:"Tampa Bay Rays",       blurb:"No. 1 prep prospect since his freshman year. Left-handed hitter with a polished hit tool, above-average speed and arm strength, and the age teams covet. Would be 1-1 in most classes." },
+  { pick:3,  round:"R1", name:"Justin Lebron",        school:"Alabama",                 type:"COL", pos:"SS",  posClass:"IF", team:"Minnesota Twins",      blurb:"SEC standout with premium physicality and a plus arm. Early hit-tool concerns have quieted this spring. Up-the-middle upside with power projection that keeps him firmly in the top three." },
+  { pick:4,  round:"R1", name:"Jacob Lombard",        school:"Gulliver Prep (FL)",      type:"HS",  pos:"SS",  posClass:"IF", team:"San Francisco Giants", blurb:"Son of former MLBer George Lombard. Power-hitting prep SS with 70-grade raw and plus speed. Miami commit who would be the consensus top prep shortstop in almost any other class." },
+  { pick:5,  round:"R1", name:"Drew Burress",         school:"Georgia Tech",            type:"COL", pos:"CF",  posClass:"OF", team:"Pittsburgh Pirates",   blurb:"5'9\" center fielder with elite contact and plus-plus speed. Posts elite launch angles and drives the ball gap-to-gap. Potential leadoff hitter of the future." },
+  { pick:6,  round:"R1", name:"Jackson Flora",        school:"UC Santa Barbara",        type:"COL", pos:"RHP", posClass:"P",  team:"Kansas City Royals",   blurb:"Best college arm in the class. Opened 2026 with 5 IP, 1 ER, 6 K with a full scouting contingent watching. Mid-to-upper-90s fastball paired with a devastating breaking ball and advanced feel." },
+  { pick:7,  round:"R1", name:"Liam Peterson",        school:"Florida",                 type:"COL", pos:"RHP", posClass:"P",  team:"Baltimore Orioles",    blurb:"One of the top three college arms in the draft. Consistent 94-97 mph fastball with a plus curveball and developing changeup. High-floor, high-rotation ceiling." },
+  { pick:8,  round:"R1", name:"Cameron Flukey",       school:"Coastal Carolina",        type:"COL", pos:"RHP", posClass:"P",  team:"Athletics",            blurb:"Completes the elite college pitching trio. Athletic right-hander with elite spin rates and exceptional late fastball life. Could push for top-5 status with a dominant spring." },
+  { pick:9,  round:"R1", name:"Derek Curiel",         school:"LSU",                     type:"COL", pos:"CF",  posClass:"OF", team:"Atlanta Braves",       blurb:"Dynamic outfielder from a loaded LSU lineup. Plus speed and genuine raw power project him as a center fielder with 20+ HR upside. One of the top college bats available." },
+  { pick:10, round:"R1", name:"Tyler Spangler",       school:"De La Salle HS (CA)",     type:"HS",  pos:"SS",  posClass:"IF", team:"Colorado Rockies",     blurb:"6'3\" Stanford commit with 10 HR as a junior — more than either Emerson or Lombard. Smooth defender whose physical frame projects future power. Could be a steal at 10." },
+  { pick:11, round:"R1", name:"Sawyer Strosnider",    school:"TCU",                     type:"COL", pos:"OF",  posClass:"OF", team:"Washington Nationals", blurb:"Power-hitting TCU outfielder with one of the prettiest swings in the class. Drives the ball to all fields with plus exit velocities and projects to hit for both average and power." },
+  { pick:12, round:"R1", name:"AJ Gracia",            school:"Virginia",                type:"COL", pos:"OF",  posClass:"OF", team:"Los Angeles Angels",   blurb:"Virginia corner outfield bat with major offensive upside. Raw power and bat speed are genuine. Profiles in left field long-term with a big bat as his calling card." },
+  { pick:13, round:"R1", name:"Carson Bolemon",       school:"Southside Christian HS",  type:"HS",  pos:"LHP", posClass:"P",  team:"St. Louis Cardinals",  blurb:"Small-school sensation who didn't allow an earned run all junior season. Touches 96 mph with an effective curve and slider. Wake Forest commit — likely the first HS pitcher off the board." },
+  { pick:14, round:"R1", name:"Gio Rojas",            school:"Stoneman Douglas HS (FL)",type:"HS",  pos:"LHP", posClass:"P",  team:"Miami Marlins",        blurb:"Led Stoneman Douglas to a state championship and pitched for Team USA 18U in its gold medal run. Up to 98 mph with a plus slider. Not expected to last past pick 15." },
+  { pick:15, round:"R1", name:"Kevin Roberts Jr.",    school:"Jackson Prep HS (MS)",    type:"HS",  pos:"CF",  posClass:"OF", team:"Arizona Diamondbacks", blurb:"Florida commit with a 70-grade run tool and elite center-field defense. Hit tool developing nicely. Top-of-the-order athlete whose speed alone makes him a first-round lock." },
+  { pick:16, round:"R1", name:"Eric Becker",          school:"Virginia",                type:"COL", pos:"SS",  posClass:"IF", team:"Texas Rangers",        blurb:"Proven college shortstop with above-average contact skills and gap power. Solid all-around defender with a safe, fast-moving profile. One of the most polished college middle infielders available." },
+  { pick:17, round:"R1", name:"Christopher Hacopian", school:"Texas A&M",              type:"COL", pos:"SS",  posClass:"IF", team:"Houston Astros",       blurb:"Pure hitter with elite plate discipline and emerging power. Patient approach that translates well to pro ball. Likely profiles at 2B long-term, but the bat keeps him in the first round." },
+  { pick:18, round:"R1", name:"Vahn Lackey",          school:"Georgia Tech",            type:"COL", pos:"C",   posClass:"C",  team:"Cincinnati Reds",      blurb:"Best college backstop in the 2026 class. Solid receiver with a plus arm, above-average bat, and advanced game-calling ability. Handled one of college baseball's best pitching staffs." },
+  { pick:19, round:"R1", name:"Rocco Maniscalco",     school:"Oxford HS (AL)",          type:"HS",  pos:"SS",  posClass:"IF", team:"Cleveland Guardians",  blurb:"One of the youngest elite draft prospects in recent memory. Mississippi State commit with quick-twitch tools and natural shortstop feel that exceed his age. Star ceiling." },
+  { pick:20, round:"R1", name:"Tyler Bell",           school:"Kentucky",                type:"COL", pos:"SS",  posClass:"IF", team:"Boston Red Sox",       blurb:"Reliable two-way shortstop from the SEC with plus defense and solid bat-to-ball skills. Emerging pull-side power rounds out a well-balanced profile. Quick path to the majors." },
+  { pick:21, round:"R1", name:"Ace Reese",            school:"Mississippi State",       type:"COL", pos:"3B",  posClass:"IF", team:"San Diego Padres",     blurb:"Power-first corner infielder with massive raw power and elite exit velocities. Posted 20+ HR for Mississippi State. Scouts debate the hit tool, but the plus-plus pop is undeniable." },
+  { pick:22, round:"R1", name:"Blake Bowen",          school:"JSerra Catholic HS (CA)", type:"HS",  pos:"CF",  posClass:"OF", team:"Detroit Tigers",       blurb:"Oregon State commit with above-average tools across the board. Strong center fielder with room to add strength. Hit tool and speed combo create a very high ceiling." },
+  { pick:23, round:"R1", name:"Coleman Borthwick",    school:"South Walton HS (FL)",    type:"HS",  pos:"RHP", posClass:"P",  team:"Chicago Cubs",         blurb:"Auburn commit and one of two Florida prep arms projected inside the first 37 picks. Up to 95 mph at 17 with a promising breaking ball. Frontline rotation ceiling." },
+  { pick:24, round:"R1", name:"Logan Schmidt",        school:"Ganesha HS (CA)",         type:"HS",  pos:"LHP", posClass:"P",  team:"Seattle Mariners",     blurb:"LSU commit and one of three elite prep southpaws in the class. Projectable left-hander with natural arm action and rare feel for a prep pitcher. True frontline starter upside." },
+  { pick:25, round:"R1", name:"Caden Sorrell",        school:"Texas A&M",               type:"COL", pos:"OF",  posClass:"OF", team:"Milwaukee Brewers",    blurb:"Physical corner outfielder with plus-plus raw power. Put up big SEC numbers and projects as a middle-of-the-order bat. Milwaukee adds the power their lineup has been lacking." },
+
+  // ═══════════════════════════════════════════════
+  //  PROSPECT PROMOTION INCENTIVE PICKS (26–28)
+  //  Awarded after Round 1 when a pre-season Top 100
+  //  prospect wins ROY or finishes top-3 in MVP/Cy Young
+  //  prior to arbitration eligibility.
+  //    26 — Atlanta Braves (Drake Baldwin, NL ROY)
+  //    27 — New York Mets
+  //    28 — Houston Astros (Hunter Brown, top-3 AL Cy Young)
+  // ═══════════════════════════════════════════════
+  {
+    pick:26, round:"PPI",
+    name:"Kaden Waechter", school:"Jesuit HS (FL)", type:"HS", pos:"RHP", posClass:"P",
+    team:"Atlanta Braves",
+    blurb:"Son of MLB pitcher Doug Waechter. One of two Florida prep righties projected in the first 37 picks. Up to 96 mph with a projectable frame and a developing secondaries arsenal. Atlanta's PPI pick earned via Drake Baldwin winning NL Rookie of the Year."
+  },
+  {
+    pick:27, round:"PPI",
+    name:"Nico Douglas", school:"Miami (FL)", type:"COL", pos:"OF", posClass:"OF",
+    team:"New York Mets",
+    blurb:"Corner outfield bat from Coral Gables with plus-plus raw power and ACC-proven production. Drives the ball to all fields with authority. New York deploys their PPI pick on one of the most exciting college bats available outside the first round."
+  },
+  {
+    pick:28, round:"PPI",
+    name:"Tyce Armstrong", school:"Baylor", type:"COL", pos:"1B", posClass:"IF",
+    team:"Houston Astros",
+    blurb:"Made national news hitting three grand slams in a single game in 2026. Historic power production at Baylor — 65-grade raw from the left side with a leverage swing. Houston's PPI pick earned via Hunter Brown finishing top-3 in AL Cy Young voting."
+  },
+
+  // ═══════════════════════════════════════════════
+  //  COMPETITIVE BALANCE ROUND A  (9 picks)
+  //  Order: CLE · KC · ARI · STL · TB (from BAL) ·
+  //         PIT · NYY · PHI · COL
+  // ═══════════════════════════════════════════════
+  { pick:"CBA-1", round:"CBA", name:"Jacob Rudner",      school:"North Carolina",    type:"COL", pos:"RHP", posClass:"P",  team:"Cleveland Guardians",   blurb:"Powerful UNC right-hander with a mid-90s fastball and a swing-and-miss slider. Above-average command. A natural fit for Cleveland's pitching-first development system." },
+  { pick:"CBA-2", round:"CBA", name:"Luke Volchko",      school:"Indiana",           type:"COL", pos:"RHP", posClass:"P",  team:"Kansas City Royals",    blurb:"One of the biggest risers entering the 2026 opener — sitting 94-97 with a cutter and leaning on a sweeper and curveball. Unique arm action generates elite deception." },
+  { pick:"CBA-3", round:"CBA", name:"Cole Young",        school:"IMG Academy (FL)",  type:"HS",  pos:"SS",  posClass:"IF", team:"Arizona Diamondbacks",  blurb:"Advanced prep shortstop with elite plate discipline for his age. Left-handed contact bat with solid athleticism and the ability to stick up the middle long-term." },
+  { pick:"CBA-4", round:"CBA", name:"Jonah Jorgensen",   school:"Oregon State",      type:"COL", pos:"RHP", posClass:"P",  team:"St. Louis Cardinals",   blurb:"The biggest riser in the class since January — fastball now sitting 95-98 with late life. Very high upside if he maintains this level throughout the spring." },
+  { pick:"CBA-5", round:"CBA", name:"Rocco Roark",       school:"Indiana State",     type:"COL", pos:"RHP", posClass:"P",  team:"Tampa Bay Rays",        blurb:"This pick acquired from Baltimore in the Shane Baz trade. Fastball/slider combo that generates elite whiff rates. Indiana State product who profiles as a dynamic backend weapon." },
+  { pick:"CBA-6", round:"CBA", name:"Casey Ponatoski",   school:"Lakeland HS (FL)",  type:"HS",  pos:"RHP", posClass:"P",  team:"Pittsburgh Pirates",    blurb:"Four-star QB recruit turned full-time pitcher, similar background to Bubba Chandler. Up to 96 mph with a projectable frame. High-variance arm with multi-sport athleticism scouts love." },
+  { pick:"CBA-7", round:"CBA", name:"Sawyer Simmons",    school:"Alabama",           type:"COL", pos:"OF",  posClass:"OF", team:"New York Yankees",      blurb:"Athletic corner outfielder with a legitimate power-speed combination. Hit well in the SEC and projects to add strength. One of the more underrated names in the class." },
+  { pick:"CBA-8", round:"CBA", name:"Austin Becker",     school:"Gonzaga",           type:"COL", pos:"LHP", posClass:"P",  team:"Philadelphia Phillies", blurb:"Left-handed arm from Gonzaga with deceptive delivery and advanced feel for three pitches. Low-90s fastball plays up with tremendous angle and movement. Fast-mover profile." },
+  { pick:"CBA-9", round:"CBA", name:"Grayson Willoughby", school:"Oral Roberts",     type:"COL", pos:"RHP", posClass:"P",  team:"Colorado Rockies",      blurb:"Featured in a January 2026 MLB Pipeline highlight reel. Power right-hander with a mid-90s fastball and a sharp breaking ball. Colorado closes Competitive Balance Round A." },
+];
+
+const ROUND_META = {
+  R1:  { label:"Round 1",                             cls:"r1",   note:"Picks 1–25 in reverse order of 2025 final standings." },
+  PPI: { label:"Prospect Promotion Incentive Picks",  cls:"rppi", note:"Awarded when a pre-season Top 100 prospect wins ROY or finishes top-3 in MVP/Cy Young voting before reaching arbitration. Picks 26 (Atlanta), 27 (New York Mets), 28 (Houston)." },
+  CBA: { label:"Competitive Balance Round A",         cls:"rcba", note:"Awarded to clubs with one of the 10 smallest markets or revenue pools. Picks are tradeable. CLE · KC · ARI · STL · TB (from BAL) · PIT · NYY · PHI · COL." },
+};
+
+function renderPicks() {
+  const container = document.getElementById('picks-container');
+  container.innerHTML = '';
+  let currentRound = null;
+
+  picks.forEach((p, i) => {
+    if (p.round !== currentRound) {
+      currentRound = p.round;
+      const m = ROUND_META[p.round];
+      const rh = document.createElement('div');
+      rh.className = 'round-header';
+      rh.innerHTML = `
+        <div class="round-label ${m.cls}">${m.label}</div>
+        <div class="round-line-v"></div>
+        <div class="round-note">${m.note}</div>
+      `;
+      container.appendChild(rh);
+    }
+
+    const isCB  = p.round === 'CBA';
+    const isPPI = p.round === 'PPI';
+    const isTop = typeof p.pick === 'number' && p.pick <= 5;
+
+    const el = document.createElement('div');
+    el.className = ['pick', isTop ? 'top-pick' : '', isPPI ? 'ppi-pick' : '', isCB ? 'cb-pick' : ''].filter(Boolean).join(' ');
+    el.style.animationDelay = (i * 0.022).toFixed(3) + 's';
+
+    el.innerHTML = `
+      <div class="pick-num">${p.pick}</div>
+      <div class="player-info">
+        <div class="player-name">${p.name}</div>
+        <div class="player-meta">${p.school} &middot; ${p.type}</div>
+      </div>
+      <div class="team-cell">${p.team}</div>
+      <div><span class="position pos-${p.posClass}">${p.pos}</span></div>
+      <div class="blurb">${p.blurb}</div>
+    `;
+    container.appendChild(el);
+  });
+}
+
+renderPicks();
+</script>
+</body>
+</html>
